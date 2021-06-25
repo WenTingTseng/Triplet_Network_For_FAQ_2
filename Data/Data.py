@@ -1,47 +1,41 @@
 ##################產生資料traindata.txt################
 import sys
-question_file='北衛_question.txt'
-answer_file='北衛_answer.txt',
-index_file='北衛_index.txt'
-output_file="traindata.txt"
-
 def get_key (dict, value):
     return [k for k, v in dict.items() if v == value]
 
-fp = open(question_file, "r")
-questions = fp.readlines()
-fp.close()
-
-fp = open(answer_file, "r")
-answer = fp.readlines()
-fp.close()
-
-fp = open(index_file, "r")
+fp = open('北衛_index.txt', "r")
 index = fp.readlines()
 fp.close()
 
-idxls=[]
-qtoidx=dict()
-idxtonum=dict()
-for idx,q in zip(index,questions):
-    qtoidx[q]=idx
-    idxls.append(idx)
-idxls=list(set(idxls))
+idxls=list(set(index))
+wp = open("IdxToNum.txt", "w")
+for i,idx in enumerate(idxls):
+    wp.writelines(str(i)+" "+idx)
+wp.close()
 
-# index=set(index)
-# for num,idx in enumerate(index):
-#     idxtonum[idx]=num
+fp = open('北衛_question.txt', "r")
+questions = fp.readlines()
+fp.close()
 
-numdict=dict()
-for key,value in qtoidx.items():
-    numdict[key]=idxls.index(value)
+fp = open('北衛_index.txt', "r")
+index = fp.readlines()
+fp.close()
 
-Newnumdict=sorted(numdict.items(), key=lambda x:x[1])
+idxtonum={}
+fp = open('IdxToNum.txt', "r")
+for line in iter(fp):
+    idxtonum[line.split()[1].strip('\n')]=int(line.split()[0])
 
-# print(len(numdict))
-#寫檔
-wp = open(output_file, "w")
+questiontonum=dict()
+for q,idx in zip(questions,index):
+    questiontonum[q]=idxtonum[idx.strip('\n')]
+for q,idx in zip(questions,index):
+    if(idx.strip('\n')=="QA-1-210"):
+        questiontonum[q]=idxtonum[idx.strip('\n')]
+
+Newnumdict=sorted(questiontonum.items(), key=lambda x:x[1])
+
+wp = open("traindata.txt", "w")
 for data in Newnumdict:
     wp.writelines(str(data[1])+" "+data[0])
 wp.close()
- 
